@@ -1,0 +1,14 @@
+void main(float3 position : POSITION,
+		  float2 texcoord : TEXCOORD0,
+		  
+		  uniform float4x4 mvp,
+		  
+		  out float4 ePosition : POSITION,
+		  out float2 oTexcoord : TEXCOORD0
+		 )
+{
+	ePosition = mul(mvp, float4(position, 1.0f));
+	oTexcoord = texcoord;
+}
+		 
+		  

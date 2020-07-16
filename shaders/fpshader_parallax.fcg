@@ -1,0 +1,20 @@
+float4 main(float4 color : COLOR0,
+			float2 texcoord : TEXCOORD0,
+			float3 position : TEXCOORD1,
+			float3 eyevec : TEXCOORD2,
+
+			uniform float scale,
+			uniform float bias,
+			
+			uniform sampler2D texture : TEXUNIT0,
+			uniform sampler2D normalMap : TEXUNIT1
+		   ) : COLOR0
+{
+	float height = tex2D(normalMap, texcoord).w;
+	float v = height*scale - bias;
+	float3 eye = normalize(eyevec);
+	float2 newCoords = texcoord + (v*eye.xy);
+	
+	return color*tex2D(texture, newCoords);
+}
+			

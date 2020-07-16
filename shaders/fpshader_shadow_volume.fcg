@@ -1,0 +1,6 @@
+float4 main(float3 lightDir : TEXCOORD0,
+			float3 normal : TEXCOORD1
+		   ) : COLOR
+{
+	return float4(1);
+}

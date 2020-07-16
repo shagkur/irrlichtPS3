@@ -1,1 +1,12 @@
-.vscode
+*.o
+*.a
+*.d
+*.elf
+*.self
+*.task
+*.vpo
+*.fpo
+*.bin
+*.elf.map
+.vscode/
+build/

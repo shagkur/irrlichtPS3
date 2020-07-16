@@ -1,0 +1,12 @@
+float4 main(float2 texcoord : TEXCOORD0,
+
+			uniform float4 globalAmbient,		// global ambient color as set by the scenemanager
+			uniform float4 Kambient,			// material ambient color
+			uniform float4 Kemissive,			// material emissive color
+			
+			uniform sampler2D texture : TEXUNIT0
+		   ) : COLOR0
+{
+	return float4(Kambient.rgb*globalAmbient.rgb + Kemissive.rgb, 1)*tex2D(texture, texcoord);
+}
+		   

@@ -1,0 +1,66 @@
+float attenuateLight(float3 P, float3 Lpos, float3 Lattn)
+{
+	float d = distance(Lpos, P);
+	return 1.0f/(Lattn.x + Lattn.y*d + Lattn.z*d*d);
+}
+
+float dualConeSpotlight(float3 P, float3 Lpos, float3 Ldir, float3 Lspot)
+{
+	float3 V = normalize(Lpos - P);
+	float direction = dot(V, Ldir);
+	return smoothstep(Lspot.x, Lspot.y, direction);
+}
+
+float4 main(float2 texcoord : TEXCOORD0,
+			float3 position : TEXCOORD1,
+			float3 eyevec : TEXCOORD2,
+			float3 lightvec : TEXCOORD3,
+			
+			uniform float4 Lposition,		// must be in object space!!!!
+			uniform float4 Ldirection,		// must be in object space!!!!
+			uniform float3 Ldiffuse,
+			uniform float3 Lspecular,
+			uniform float3 Lattenuation,
+			uniform float3 Lspot,
+			
+			uniform float3 Kdiffuse,
+			uniform float3 Kspecular,
+			
+			uniform float shininess,
+			
+			uniform float scale,
+			uniform float bias,
+			
+			uniform sampler2D texture : TEXUNIT0,
+			uniform sampler2D normalMap : TEXUNIT1
+		   ) : COLOR0
+{
+	float attenuation = 1.0f;
+	float3 V = normalize(eyevec);
+	float3 L = normalize(lightvec);
+	float height = tex2D(normalMap, texcoord).w;
+	float v = height*scale - bias;
+	float2 newCoords = texcoord + (v*V.xy);
+	float3 nrm = tex2D(normalMap, newCoords).xyz*2.0f - 1.0f;
+	float3 baseColor = tex2D(texture, newCoords);
+	
+	if(Lposition.w != 0.0f) {
+		attenuation = attenuateLight(position.xyz, Lposition.xyz, Lattenuation);
+
+		if(Ldirection.w == 0.0f) {
+			attenuation = attenuation*dualConeSpotlight(position.xyz, Lposition.xyz, Ldirection.xyz, Lspot);
+		}
+	}
+	
+	float specularLight = 0.0f;
+	float diffuseLight = max(0.0f, dot(nrm, L));
+	if(shininess > 0.0f && diffuseLight > 0.0f) {
+		float3 H = normalize(L + V);
+		specularLight = pow(max(0.0f, dot(nrm, H)), shininess);
+	}
+
+	float3 diffuse = Kdiffuse*Ldiffuse*diffuseLight*attenuation;
+	float3 specular = Kspecular*Lspecular*specularLight*attenuation;
+	
+	return float4(diffuse*baseColor.rgb + specular, 1.0f);
+}

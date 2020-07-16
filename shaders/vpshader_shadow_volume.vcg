@@ -1,0 +1,51 @@
+void main(float3 position : POSITION,
+		  float3 normal : NORMAL,
+
+		  uniform float4x4 mvp,
+		  
+		  uniform float4 lightPos,
+		  uniform float shadowExtent,
+		  
+		  out float4 oPosition : POSITION
+		 )
+{
+/*
+	const float4 one = 1;
+	const float4 zero = 0;
+	
+	float3 lightVector;
+	
+	if(lightPos.w == 0.0f)
+		lightVector = -lightPos.xyz;
+	else
+		lightVector = lightPos.xyz - position.xyz;
+	
+	float lightDotNorm = dot(lightVector, normal);
+	float3 toSubtract = float3(lightDotNorm < 0);
+	
+	toSubtract *= lightPos.xyz;
+	
+	float4 pos = float4(position - toSubtract, 1.0f);
+	float4 toMult = float4(one.xyz, (lightDotNorm > 0));
+
+	pos *= 	toMult;
+	
+	oPosition = mul(mvp, pos);
+*/
+	float distance;
+	float3 extrusion;
+	
+	if(lightPos.w == 0.0f)
+		extrusion = lightPos.xyz;
+	else
+		extrusion = position.xyz - lightPos.xyz;
+		
+	distance = length(extrusion);
+	extrusion = normalize(extrusion)*max(0, shadowExtent - distance);
+	
+	float ndotl = dot(normal, extrusion);
+	float3 finalPos = (ndotl < 0) ? position : position + extrusion;
+	
+	oPosition = mul(mvp, float4(finalPos, 1.0f));
+}
+		 

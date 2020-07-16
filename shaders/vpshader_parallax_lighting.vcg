@@ -1,0 +1,32 @@
+void main(float3 position : POSITION,
+		  float3 normal : NORMAL,
+		  float2 texcoord : TEXCOORD0,
+		  float3 tangent : TANGENT,
+		  float3 binormal : BINORMAL,
+
+		  uniform float4x4 mvp,
+		  
+		  uniform float3 eyePos,			// must be in object space!!!!
+			
+		  uniform float4 Lposition,			// must be in object space!!!!
+
+		  out float4 ePosition : POSITION,
+		  out float2 oTexcoord : TEXCOORD0,
+		  out float3 oPosition : TEXCOORD1,
+		  out float3 oEyeVec : TEXCOORD2,
+		  out float3 oLightVec : TEXCOORD3
+		 )
+{
+	float3x3 tbn = float3x3(tangent, binormal, normal);
+
+	ePosition = mul(mvp, float4(position, 1.0f));
+	oTexcoord = texcoord;
+	oPosition = position;
+	oEyeVec  = mul(tbn, eyePos - position);
+	
+	if(Lposition.w == 0.0f) {
+		oLightVec = mul(tbn, Lposition.xyz);
+	} else {
+		oLightVec = mul(tbn, Lposition.xyz - position.xyz);
+	}	
+}
