@@ -57,9 +57,10 @@ namespace irr
 			if(_fileSystem != NULL) _fileSystem->drop();
 			if(_driver != NULL) _driver->drop();
 			if(_geometryCreator != NULL) _geometryCreator->drop();
+			if(_meshCache != NULL) _meshCache->drop();
+			if(_physicsManager != NULL) _physicsManager->drop();
 
-			u32 i;
-			for(i=0;i < _meshLoaderList.size();i++)
+			for(u32 i=0;i < _meshLoaderList.size();i++)
 				_meshLoaderList[i]->drop();
 		}
 

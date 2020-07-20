@@ -162,7 +162,7 @@ void GCMDebugFontRenderer::printStart(f32 r, f32 g, f32 b, f32 a)
 void GCMDebugFontRenderer::printPass(DebugFont::Position *pPositions, DebugFont::TexCoord *pTexCoords, DebugFont::Color *pColors, s32 numVerts)
 {
 	while(*mLabel != mLabelValue)
-		usleep(30);
+		usleep(10);
 
 	mLabelValue++;
 

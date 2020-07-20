@@ -387,6 +387,8 @@ namespace irr
 				rsxSetFrontFace(_gcmRootContext, GCM_FRONTFACE_CW);
 				rsxSetClearReport(_gcmRootContext, GCM_ZPASS_PIXEL_CNT);
 				rsxSetZControl(_gcmRootContext, GCM_TRUE, GCM_FALSE, GCM_FALSE);
+				rsxSetZCullControl(_gcmRootContext, GCM_ZCULL_LESS, GCM_ZCULL_LONES);
+				rsxSetSCullControl(_gcmRootContext, GCM_SCULL_SFUNC_LESS, 1, 0xff);
 				rsxSetReturnCommand(_gcmRootContext);
 			}
 			rsxSetDefaultCommandBuffer(&_gcmRootContext);
@@ -1415,6 +1417,8 @@ namespace irr
 			_drawSurface.height				= _videoResolution.height;
 			_drawSurface.x					= 0;
 			_drawSurface.y					= 0;
+
+			gcmSetZcull(0, _depthOffset, rsxAlign(64, _videoResolution.width), rsxAlign(64, _videoResolution.height), 0, GCM_ZCULL_Z24S8, GCM_SURFACE_CENTER_1, GCM_ZCULL_LESS, GCM_ZCULL_LONES, GCM_SCULL_SFUNC_LESS, 1, 0xff);
 		}
 
 		void CRSXDriver::setFramebufferTarget(u32 index)
