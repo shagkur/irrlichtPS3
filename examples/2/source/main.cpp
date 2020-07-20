@@ -17,6 +17,11 @@
 
 #include <irrlicht/irrlicht.h>
 
+#include "room_3ds.h"
+#include "rockwall_jpg.h"
+#include "rockwall_height_bmp.h"
+#include "particlegreen_jpg.h"
+
 #define HOSTBUFFER_SIZE				(128*1024*1024)
 
 using namespace irr;
@@ -28,17 +33,19 @@ int main(int argc, char *argv[])
 	IrrlichtDevice *device = NULL;
 	scene::ISceneManager *smgr = NULL;
 	video::IVideoDriver *driver = NULL;
+	io::IFileSystem *fs = NULL;
 
 	device = createDevice(core::dimension2d<u32>(1280, 768), true, false, NULL, HOSTBUFFER_SIZE);
 
 	driver = device->getVideoDriver();
 	smgr = device->getSceneManager();
+	fs = device->getFileSystem();
 
 	scene::ICameraSceneNode *camera = smgr->addCameraSceneNodeFPS();
 	camera->setPosition(core::vector3df(-200.0f, 200.0f, -200.0f));
 
 	scene::ISceneNode *room = NULL;
-	scene::IAnimatedMesh *roomMesh = smgr->getMesh("/dev_usb000/models/room.3ds");
+	scene::IAnimatedMesh *roomMesh = smgr->getMesh(fs->createMemoryReadFile(const_cast<u8*>(room_3ds), room_3ds_size, "room.3ds"));
 
 	printf("glbamb: %08x\n", smgr->getAmbientLight().toSColor().color);
 
@@ -52,14 +59,14 @@ int main(int argc, char *argv[])
 		room->getMaterial(0).shininess = 0.0f;
 
 		driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
-		video::ITexture *normalMap = driver->getTexture("/dev_usb000/textures/rockwall_height.bmp");
+		video::ITexture *normalMap = driver->getTexture(fs->createMemoryReadFile(const_cast<u8*>(rockwall_height_bmp), rockwall_height_bmp_size, "rockwall_height.bmp"));
 		if(normalMap != NULL) driver->makeNormalMapTexture(normalMap, 0.6f);
 
 		driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
 
 		//room->setMaterialTexture(0, normalMap);
 
-		room->setMaterialTexture(0, driver->getTexture("/dev_usb000/textures/rockwall.jpg"));
+		room->setMaterialTexture(0, driver->getTexture(fs->createMemoryReadFile(const_cast<u8*>(rockwall_jpg), rockwall_jpg_size, "rockwall.jpg")));
 		room->setMaterialTexture(1, normalMap);
 		room->setMaterialType(video::EMT_PARALLAX_MAP_SOLID);
 		room->getMaterial(0).materialTypeParams[0] = 0.04f;
@@ -78,15 +85,15 @@ int main(int argc, char *argv[])
 	bill->setMaterialFlag(video::EMF_LIGHTING, false);
 	bill->setMaterialFlag(video::EMF_ZWRITE_ENABLE, false);
 	bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-	bill->setMaterialTexture(0, driver->getTexture("/dev_usb000/textures/particlegreen.jpg"));
+	bill->setMaterialTexture(0, driver->getTexture(fs->createMemoryReadFile(const_cast<u8*>(particlegreen_jpg), particlegreen_jpg_size, "particlegreen.jpg")));
 
 	while(device->run()) {
 
 		driver->beginScene(true, true);
 		smgr->drawAll();
 
-		DebugFont::setPosition(0, 10);
-		DebugFont::setColor(1.0f, 0.0f, 0.0f, 1.0f);
+		DebugFont::setPosition(10, 10);
+		DebugFont::setColor(1.0f, 1.0f, 1.0f, 0.0f);
 
 		DebugFont::print("Irrlicht sample 2\n\n");
 		DebugFont::printf("FPS: %.2f\n", (f32)driver->getFPS());
@@ -95,6 +102,7 @@ int main(int argc, char *argv[])
 	}
 
 	device->terminate();
+	device->drop();
 
 	printf("done\n");
 	return 0;
